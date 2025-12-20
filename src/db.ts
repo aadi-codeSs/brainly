@@ -1,8 +1,7 @@
 import mongoose, { Types } from "mongoose";
-import { required } from "zod/v4/core/util.cjs";
 
 const Schema = mongoose.Schema;
-const ObjectId = mongoose.Types.ObjectId;
+const ObjectId = Types.ObjectId;
 
 const UserSchema = new Schema({
     username: {type: String,required: true, unique: true},
@@ -15,19 +14,23 @@ const TagSchema = new Schema({
 
 const typesArray = ["image", "video", "article", "audio"];
 
-const User = mongoose.model("user", UserSchema);
-const Tag = mongoose.model("tag", TagSchema);
+const UserModel = mongoose.model("user", UserSchema);
+const TagModel = mongoose.model("tag", TagSchema);
 
 const ContentSchema = new Schema({
     link: {type: String, required: true},
     title: {type: String, required: true},
     type: {type: String, required: true, enum: typesArray},
-    tag: [{type: Types.ObjectId, ref: Tag}],
-    contentId: {type: Types.ObjectId, ref: User, required: true}
+    tag: [{type: Types.ObjectId, ref: TagModel}],
+    contentId: {type: mongoose.Types.ObjectId, ref: "user", required: true}
 });
 
 const linkSchema = new Schema({
     hash: {type: String, required: true},
-    userid: {type: Types.ObjectId, ref: User, required: true}
+    userid: {type: Types.ObjectId, ref: UserModel, required: true}
 });
 
+const ContentModel = mongoose.model("content", ContentSchema);
+const LinkModel = mongoose.model("links", linkSchema);
+
+export {UserModel, TagModel, ContentModel, LinkModel};
