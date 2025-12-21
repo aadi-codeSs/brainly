@@ -6,6 +6,8 @@ import z from "zod";
 import { UserModel, TagModel, ContentModel, LinkModel } from "./db.js";
 import { JWT_SECRET } from "./config.js";
 import { AuthMiddleware } from "./middleware.js";
+import { randomString } from "zod/v4/core/util.cjs";
+
 
 mongoose.connect("mongodb+srv://adityasingh0999_db_user:8HmOOlVSjUgLCy0N@projects.jg9tssk.mongodb.net/brainly")
 
@@ -115,6 +117,52 @@ app.get("/api/v1/content", AuthMiddleware, async (req, res) => {
         })
     }
 })
+
+app.delete("/api/v1/content", AuthMiddleware, async (req, res) => {
+    const contentId = req.body.contentId;
+
+    try{
+     await ContentModel.deleteMany({contentId, userId: req.userId})
+    }
+    catch(e){
+        res.status(404).json({
+            message: "unable to delete"
+        })
+        return
+    }
+
+    res.json({
+        message: "successfully deleted the content"
+    })
+})
+
+app.post("/api/v1/brain/share", AuthMiddleware, async (req, res) => {
+    const { share } = req.body;
+    const userIdFetched = new mongoose.Types.ObjectId(req.userId);
+    if( share ){
+        const existingLink = await LinkModel.findOne({
+            userId: userIdFetched
+        })
+    if(existingLink){
+        res.json({ hash: existingLink.hash });
+        return
+    }
+
+    const hash = randomString(10);
+    await LinkModel.create( { userId: userIdFetched, hash} );
+    res.json({ hash });
+
+    }
+    else{
+        await LinkModel.deleteOne({
+            userId: userIdFetched
+        })
+        res.json({
+            message: "Shareable link removed"
+        })
+    }
+})
+
 
 
 app.listen(3000);
