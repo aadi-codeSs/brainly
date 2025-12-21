@@ -97,6 +97,24 @@ app.post("/api/v1/content", AuthMiddleware, async (req, res) => {
     })
 })
 
+app.get("/api/v1/content", AuthMiddleware, async (req, res) => {
+    const contentId = new mongoose.Types.ObjectId(req.userId);
+
+    const contentArray = await ContentModel.find({
+        contentId: contentId
+    }).select("link title type tag -_id");
+
+    if(contentArray){
+        res.json({
+            contentArray
+        })
+    }
+    else{
+        res.status(404).json({
+            message: "No content uploaded by user"
+        })
+    }
+})
 
 
 app.listen(3000);
