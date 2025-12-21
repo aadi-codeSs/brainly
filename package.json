@@ -19,7 +19,9 @@
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
     "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.1",

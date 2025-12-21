@@ -6,7 +6,8 @@ import z from "zod";
 import { UserModel, TagModel, ContentModel, LinkModel } from "./db.js";
 import { JWT_SECRET } from "./config.js";
 import { AuthMiddleware } from "./middleware.js";
-import { randomString } from "zod/v4/core/util.cjs";
+import { core } from "zod";
+import { randomString } from "./utlilis.js";
 
 
 mongoose.connect("mongodb+srv://adityasingh0999_db_user:8HmOOlVSjUgLCy0N@projects.jg9tssk.mongodb.net/brainly")
@@ -163,6 +164,35 @@ app.post("/api/v1/brain/share", AuthMiddleware, async (req, res) => {
     }
 })
 
+app.get("/api/v1/brain/sharedLink", AuthMiddleware, async (req, res) => {
+    const sharedLink = req.params.sharedLink;
 
+    const link = await LinkModel.findOne({
+       sharedLink
+    })
+    if(!link){
+        res.status(404).json({
+            message: "Invalid Link"
+        })
+        return
+    }
+    else{
+        const content = await ContentModel.find({
+            contentId: link.userId
+        }).select(" link title type tag ")
+        const user = await UserModel.findById(link.userId)
+
+        if(!user){
+            res.status(404).json({
+                message: "user doesnt exist"
+            })  
+            return 
+        }
+        res.json({
+                username: user.username,
+                content
+            })
+    }
+})
 
 app.listen(3000);
