@@ -12,7 +12,7 @@ const TagSchema = new Schema({
     tag: {type: String,required: true, unique: true},
 });
 
-const typesArray = ["image", "video", "article", "audio"];
+const typesArray = ["tweet", "yt", "doc"];
 
 const UserModel = mongoose.model("user", UserSchema);
 const TagModel = mongoose.model("tag", TagSchema);

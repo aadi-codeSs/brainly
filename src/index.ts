@@ -6,14 +6,14 @@ import z from "zod";
 import { UserModel, TagModel, ContentModel, LinkModel } from "./db.js";
 import { JWT_SECRET } from "./config.js";
 import { AuthMiddleware } from "./middleware.js";
-import { core } from "zod";
 import { randomString } from "./utlilis.js";
-
+import cors from "cors";
 
 mongoose.connect("mongodb+srv://adityasingh0999_db_user:8HmOOlVSjUgLCy0N@projects.jg9tssk.mongodb.net/brainly")
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.post("/api/v1/signup", async (req, res) => {
 
