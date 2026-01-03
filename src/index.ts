@@ -85,11 +85,12 @@ app.post("/api/v1/signin", async (req, res) => {
 })
 
 app.post("/api/v1/content", AuthMiddleware, async (req, res) => {
-    const {link, title, type} = req.body;
+    const {link, title, type, description} = req.body;
 
     await ContentModel.create({
         link: link,
         title: title,
+        description: description,
         type: type,
         contentId: new mongoose.Types.ObjectId(req.userId),
         tag: [],
@@ -105,7 +106,7 @@ app.get("/api/v1/content", AuthMiddleware, async (req, res) => {
 
     const contentArray = await ContentModel.find({
         contentId: contentId
-    }).select("link title type tag -_id");
+    }).select("link title type tag -_id description");
 
     if(contentArray){
         res.json({

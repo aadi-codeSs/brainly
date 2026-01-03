@@ -20,6 +20,7 @@ const TagModel = mongoose.model("tag", TagSchema);
 const ContentSchema = new Schema({
     link: {type: String, required: true},
     title: {type: String, required: true},
+    description: {type: String},
     type: {type: String, required: true, enum: typesArray},
     tag: [{type: Types.ObjectId, ref: TagModel}],
     contentId: {type: mongoose.Types.ObjectId, ref: "user", required: true}
