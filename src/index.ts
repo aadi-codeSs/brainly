@@ -106,7 +106,7 @@ app.get("/api/v1/content", AuthMiddleware, async (req, res) => {
 
     const contentArray = await ContentModel.find({
         contentId: contentId
-    }).select("link title type tag -_id description");
+    }).select("link title type tag _id description");
 
     if(contentArray){
         res.json({
@@ -122,20 +122,44 @@ app.get("/api/v1/content", AuthMiddleware, async (req, res) => {
 
 app.delete("/api/v1/content", AuthMiddleware, async (req, res) => {
     const contentId = req.body.contentId;
+    const userId = req.userId;
 
-    try{
-     await ContentModel.deleteMany({contentId, userId: req.userId})
-    }
-    catch(e){
-        res.status(404).json({
-            message: "unable to delete"
-        })
-        return
+    if (!contentId || typeof contentId !== "string") {
+        res.status(400).json({ message: "contentId (string) is required" });
+        return;
     }
 
-    res.json({
-        message: "successfully deleted the content"
-    })
+    if (!userId || typeof userId !== "string") {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
+
+    try {
+        const contentObjectId = new mongoose.Types.ObjectId(contentId.trim());
+        const userObjectId = new mongoose.Types.ObjectId(userId.trim());
+
+        // Delete the specific document and ensure it belongs to the requesting user (contentId is the owner field in the schema)
+        const result = await ContentModel.deleteOne({
+            _id: contentObjectId,
+            contentId: userObjectId
+        });
+
+        if (!result || (result as any).deletedCount === 0) {
+            return res.status(404).json({
+                message: "Content not found or you don't represent the owner"
+            });
+        }
+
+        res.json({
+            message: "Successfully deleted the content"
+        });
+
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({
+            message: "Internal server error"
+        });
+    }
 })
 
 app.post("/api/v1/brain/share", AuthMiddleware, async (req, res) => {
